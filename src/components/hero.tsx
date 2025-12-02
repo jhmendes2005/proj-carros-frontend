@@ -1,35 +1,44 @@
 // src/components/Hero.tsx
 
-"use client"; 
+"use client";
 
-import React, { useCallback } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import useEmblaCarousel from 'embla-carousel-react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useCallback } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import useEmblaCarousel from "embla-carousel-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
-// 1. Definição dos slides (com texto descomentado para teste)
-const slides = [
+// --- Interface do slide ---
+interface Slide {
+  imageSrc: string;
+  alt: string;
+  href?: string;
+  title?: string;
+  subtitle?: string;
+  buttonText?: string;
+}
+
+// --- Slides do carrossel ---
+const slides: Slide[] = [
   {
     imageSrc: "https://bomjesusautomoveis.com/wp-content/uploads/2024/11/6.png",
     alt: "Banner principal da Bom Jesus Automóveis",
-    //title: "Bom Jesus Automóveis",
-    //subtitle: "Qualidade e confiança na compra do seu próximo veículo.",
-    href: "/estoque", 
-    //buttonText: "Ver Estoque"
+    // title: "Bom Jesus Automóveis",
+    // subtitle: "Qualidade e confiança na compra do seu próximo veículo.",
+    href: "/estoque",
+    // buttonText: "Ver Estoque",
   },
   {
     imageSrc: "https://bomjesusautomoveis.com/wp-content/uploads/2024/11/7.png",
     alt: "Ofertas da Semana",
-    //title: "Ofertas da Semana",
+    // title: "Ofertas da Semana",
     href: "/estoque?destaque=true",
-    //buttonText: "Ver Ofertas"
+    // buttonText: "Ver Ofertas",
   },
   {
     imageSrc: "https://bomjesusautomoveis.com/wp-content/uploads/2024/11/6.png",
     alt: "Banner apenas com imagem",
-    // Sem nada
-  }
+  },
 ];
 
 export default function Hero() {
@@ -45,56 +54,46 @@ export default function Hero() {
 
   return (
     <div className="relative w-full">
-      
+      {/* Carrossel */}
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {slides.map((slide, index) => (
-            
-            // 2. A MUDANÇA PRINCIPAL ESTÁ AQUI
-            // Removemos a altura fixa (h-[...]) e usamos 'aspect-ratio'.
-            // aspect-video = 16:9 (bom para celular)
-            // md:aspect-[21/9] = Proporção de cinema (para desktop)
-            // max-h-[500px] = Limite de altura para telas muito grandes
-            <div 
-              className="relative w-full aspect-video md:aspect-[21/9] max-h-[500px] flex-none"
+            <div
               key={index}
+              className="relative w-full aspect-video md:aspect-[21/9] max-h-[500px] flex-none"
             >
-              
+              {/* Imagem */}
               <Image
                 src={slide.imageSrc}
-                alt={slide.alt || 'Banner de slide'}
+                alt={slide.alt}
                 fill
-                style={{ objectFit: 'cover' }} // 'cover' ainda é o correto
-                priority={index === 0} 
+                style={{ objectFit: "cover" }}
+                priority={index === 0}
                 quality={75}
               />
-              
-              {/* Overlay condicional (só aparece se tiver texto) */}
+
+              {/* Overlay escuro se houver texto */}
               {(slide.title || slide.subtitle) && (
                 <div className="absolute inset-0 bg-black opacity-40 z-10" />
               )}
 
-              {/* Conteúdo condicional */}
+              {/* Conteúdo do slide */}
               <div className="relative z-20 flex flex-col items-center justify-center text-center text-white p-4 h-full">
-                
                 {slide.title && (
-                  // Texto responsivo
                   <h1 className="text-3xl md:text-5xl font-extrabold mb-4">
                     {slide.title}
                   </h1>
                 )}
-                
+
                 {slide.subtitle && (
-                  // Texto responsivo
                   <p className="text-base md:text-xl max-w-2xl mb-8">
                     {slide.subtitle}
                   </p>
                 )}
-                
+
                 {slide.href && slide.buttonText && (
                   <Link
-                    href={slide.href} 
-                    // Botão responsivo
+                    href={slide.href}
                     className="rounded-lg bg-blue-600 px-5 py-2.5 md:px-6 md:py-3 text-sm md:text-lg font-semibold text-white shadow-lg transition-transform hover:scale-105 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
                   >
                     {slide.buttonText}
@@ -106,7 +105,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Botões de seta responsivos */}
+      {/* Botões de navegação */}
       <button
         className="absolute top-1/2 left-2 md:left-4 z-30 -translate-y-1/2 rounded-full bg-white/70 p-1 md:p-2 text-gray-800 shadow-md transition hover:bg-white"
         onClick={scrollPrev}
@@ -120,7 +119,6 @@ export default function Hero() {
       >
         <ArrowRight size={20} className="md:h-6 md:w-6" />
       </button>
-
     </div>
   );
 }
