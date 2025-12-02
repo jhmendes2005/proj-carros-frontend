@@ -149,11 +149,11 @@ export default function Contato() {
               <ul className="space-y-3 text-sm text-blue-100">
                 <li className="flex justify-between border-b border-blue-500 pb-2">
                   <span>Segunda a Sexta</span>
-                  <span className="font-bold text-white">08:00 - 18:00</span>
+                  <span className="font-bold text-white">08:30 - 18:30</span>
                 </li>
                 <li className="flex justify-between border-b border-blue-500 pb-2">
                   <span>Sábado</span>
-                  <span className="font-bold text-white">08:00 - 13:00</span>
+                  <span className="font-bold text-white">08:30 - 15:00</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Domingo</span>

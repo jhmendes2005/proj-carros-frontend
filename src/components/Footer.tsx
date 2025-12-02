@@ -76,10 +76,15 @@ export default function Footer() {
                   R. Prof. Becker, 3377 - Santa Cruz<br />
                   Guarapuava - PR, 85015-230
                 </span>
+                <MapPin className="h-6 w-6 text-blue-500 flex-shrink-0 mt-1" />
+                <span className="text-sm">
+                  R. Prof. Becker, 3377 - Santa Cruz<br />
+                  Guarapuava - PR, 85015-230
+                </span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-blue-500 flex-shrink-0" />
-                <span className="text-sm">(42) 98421-3935</span>
+                <span className="text-sm">(42) 98439-9009</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-blue-500 flex-shrink-0" />
@@ -96,11 +101,11 @@ export default function Footer() {
             <div className="space-y-2 text-sm text-gray-400 mb-6">
               <p className="flex justify-between">
                 <span>Segunda a Sexta:</span>
-                <span className="text-white">08:00 às 18:00</span>
+                <span className="text-white">08:30 às 18:30</span>
               </p>
               <p className="flex justify-between">
                 <span>Sábado:</span>
-                <span className="text-white">08:00 às 13:00</span>
+                <span className="text-white">08:30 às 15:00</span>
               </p>
               <p className="flex justify-between">
                 <span>Domingo:</span>
