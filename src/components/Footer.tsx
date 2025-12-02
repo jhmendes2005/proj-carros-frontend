@@ -73,8 +73,8 @@ export default function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin className="h-6 w-6 text-blue-500 flex-shrink-0 mt-1" />
                 <span className="text-sm">
-                  R. Prof. Becker, 3377 - Santa Cruz<br />
-                  Guarapuava - PR, 85015-230
+                  Av. Pref. Moacyr Júlio Silvestri, 23 - Centro<br />
+                  Guarapuava - PR, 85010-090
                 </span>
                 <MapPin className="h-6 w-6 text-blue-500 flex-shrink-0 mt-1" />
                 <span className="text-sm">
