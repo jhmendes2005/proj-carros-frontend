@@ -1,5 +1,3 @@
-// src/components/Hero.tsx
-
 "use client";
 
 import React, { useCallback } from "react";
@@ -8,7 +6,6 @@ import Image from "next/image";
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-// --- Interface do slide ---
 interface Slide {
   imageSrc: string;
   alt: string;
@@ -18,26 +15,22 @@ interface Slide {
   buttonText?: string;
 }
 
-// --- Slides do carrossel ---
 const slides: Slide[] = [
   {
-    imageSrc: "https://bomjesusautomoveis.com/wp-content/uploads/2024/11/6.png",
+    imageSrc: "/banner2.png", // Ajuste para referência correta
     alt: "Banner principal da Bom Jesus Automóveis",
-    // title: "Bom Jesus Automóveis",
-    // subtitle: "Qualidade e confiança na compra do seu próximo veículo.",
+    //title: "Bom Jesus Automóveis",
+    //subtitle: "Qualidade e confiança na compra do seu próximo veículo.",
     href: "/estoque",
-    // buttonText: "Ver Estoque",
+    //buttonText: "Ver Estoque",
   },
   {
-    imageSrc: "https://bomjesusautomoveis.com/wp-content/uploads/2024/11/7.png",
-    alt: "Ofertas da Semana",
-    // title: "Ofertas da Semana",
-    href: "/estoque?destaque=true",
-    // buttonText: "Ver Ofertas",
-  },
-  {
-    imageSrc: "https://bomjesusautomoveis.com/wp-content/uploads/2024/11/6.png",
-    alt: "Banner apenas com imagem",
+    imageSrc: "/banner.png", // Ajuste para referência correta
+    alt: "Banner principal da Bom Jesus Automóveis",
+    //title: "Bom Jesus Automóveis",
+    //subtitle: "Qualidade e confiança na compra do seu próximo veículo.",
+    href: "/estoque",
+    //buttonText: "Ver Estoque",
   },
 ];
 
@@ -62,7 +55,6 @@ export default function Hero() {
               key={index}
               className="relative w-full aspect-video md:aspect-[21/9] max-h-[500px] flex-none"
             >
-              {/* Imagem */}
               <Image
                 src={slide.imageSrc}
                 alt={slide.alt}
@@ -72,12 +64,10 @@ export default function Hero() {
                 quality={75}
               />
 
-              {/* Overlay escuro se houver texto */}
               {(slide.title || slide.subtitle) && (
-                <div className="absolute inset-0 bg-black opacity-40 z-10" />
+                <div className="absolute inset-0 bg-black/40 z-10" />
               )}
 
-              {/* Conteúdo do slide */}
               <div className="relative z-20 flex flex-col items-center justify-center text-center text-white p-4 h-full">
                 {slide.title && (
                   <h1 className="text-3xl md:text-5xl font-extrabold mb-4">

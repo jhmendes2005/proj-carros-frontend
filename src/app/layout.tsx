@@ -58,7 +58,7 @@ export default function RootLayout({
           <Footer />
           
           {/* Botões flutuantes */}
-          <AIChatButton />
+          {/* <AIChatButton /> */}
           <FloatingWhatsApp />
           
         </WhatsAppProvider>
