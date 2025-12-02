@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* === CAR LOADER === */
+
+.car-body {
+  animation: shake 0.2s ease-in-out infinite alternate;
+}
+
+.car-line {
+  transform-origin: center right;
+  stroke-dasharray: 22;
+  animation: line 0.8s ease-in-out infinite both;
+}
+
+.car-line-top {
+  animation-delay: 0s;
+}
+
+.car-line-middle {
+  animation-delay: 0.2s;
+}
+
+.car-line-bottom {
+  animation-delay: 0.4s;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateY(-1%);
+  }
+  100% {
+    transform: translateY(3%);
+  }
+}
+
+@keyframes line {
+  0% {
+    stroke-dashoffset: 22;
+  }
+  25% {
+    stroke-dashoffset: 22;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  51% {
+    stroke-dashoffset: 0;
+  }
+  80% {
+    stroke-dashoffset: -22;
+  }
+  100% {
+    stroke-dashoffset: -22;
+  }
+}
