@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../lib/api";
 import { useParams } from "next/navigation";
+import { trackEvent } from "../../../components/AnalyticsTracker";
 import Link from "next/link";
 import {
   Calendar,
@@ -144,6 +145,16 @@ export default function DetalheVeiculo() {
       api.get(`/vehicles/${slug}`)
         .then((res) => {
           setVeiculo(res.data);
+          
+          // 📊 TRACKING: ViewContent (Visualização do Produto)
+          trackEvent('ViewContent', {
+            content_name: `${res.data.marca} ${res.data.modelo}`,
+            content_ids: [res.data.id], 
+            content_type: 'product',
+            value: res.data.preco,
+            currency: 'BRL'
+          });
+
           if (res.data.fotos && res.data.fotos.length > 0) {
             setFotoPrincipal(res.data.fotos[0]);
           }
@@ -161,6 +172,12 @@ export default function DetalheVeiculo() {
 
   // Handler de Compartilhamento
   const handleShare = async () => {
+    // 📊 TRACKING: Lead (Ação de Compartilhar)
+    trackEvent('Lead', { 
+        content_name: 'Compartilhar',
+        content_category: 'User Action'
+    });
+
     if (navigator.share) {
       try {
         await navigator.share({
@@ -229,28 +246,7 @@ export default function DetalheVeiculo() {
                     ))}
                 </div>
             )}
-
-            {/* Descrição e Opcionais (Desktop) */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mt-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Sobre este veículo</h3>
-                <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                    {veiculo.descricao || "Entre em contato para mais informações sobre este veículo."}
-                </p>
-
-                {veiculo.opcionais && veiculo.opcionais.length > 0 && (
-                    <div className="mt-8">
-                        <h4 className="font-bold text-gray-900 mb-3">Opcionais</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {veiculo.opcionais.map((opc, idx) => (
-                                <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                                    <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
-                                    <span>{opc}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
+            {/* A descrição foi movida daqui para baixo */}
           </div>
 
           {/* --- COLUNA DIREITA (DETALHES E CTA) --- */}
@@ -287,6 +283,15 @@ export default function DetalheVeiculo() {
                         href={`https://api.whatsapp.com/send?phone=5542984399009&text=${whatsappText}`}
                         target="_blank"
                         rel="noopener noreferrer"
+                        // 📊 TRACKING: Contact (Clique no WhatsApp)
+                        onClick={() => {
+                            trackEvent('Contact', {
+                                content_name: 'WhatsApp',
+                                content_category: 'Lead',
+                                value: veiculo.preco,
+                                currency: 'BRL'
+                            });
+                        }}
                         className="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-6 py-4 text-white font-bold shadow-green-200 shadow-lg transition-all hover:bg-green-700 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
                     >
                         <MessageCircle size={22} />
@@ -302,6 +307,29 @@ export default function DetalheVeiculo() {
                     </button>
                 </div>
             </div>
+          </div>
+
+          {/* --- DESCRIÇÃO E OPCIONAIS (Reposicionado) --- */}
+          {/* Agora é o 3º filho do Grid. No mobile aparece por último (Abaixo de tudo). No Desktop, ocupa a coluna da esquerda (col-span-8). */}
+          <div className="lg:col-span-8 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Sobre este veículo</h3>
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                  {veiculo.descricao || "Entre em contato para mais informações sobre este veículo."}
+              </p>
+
+              {veiculo.opcionais && veiculo.opcionais.length > 0 && (
+                  <div className="mt-8">
+                      <h4 className="font-bold text-gray-900 mb-3">Opcionais</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                          {veiculo.opcionais.map((opc, idx) => (
+                              <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                                  <CheckCircle2 size={16} className="text-green-500 flex-shrink-0" />
+                                  <span>{opc}</span>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+              )}
           </div>
 
         </div>

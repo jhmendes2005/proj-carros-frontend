@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/src/lib/api";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, Loader2 } from "lucide-react";
 
-// Categorias definidas
+// Categorias definidas (fixas ou vindas do backend, aqui mantive fixas mas enviando para a API)
 const vehicleTypes = ["Carro", "Moto", "Caminhao", "Van", "Utilitario", "Caminhonete"];
 
 const priceRanges = [10000, 20000, 30000, 40000, 50000, 75000, 100000, 150000, 200000];
@@ -18,6 +18,10 @@ export default function AdvancedSearch() {
   const [models, setModels] = useState<string[]>([]);
   const [years, setYears] = useState<number[]>([]);
 
+  // Estado de Loading Global para bloquear interações
+  const [loadingCount, setLoadingCount] = useState(0);
+  const isLoading = loadingCount > 0;
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedBrand, setSelectedBrand] = useState("");
@@ -27,33 +31,57 @@ export default function AdvancedSearch() {
   const [selectedMinPrice, setSelectedMinPrice] = useState("");
   const [selectedMaxPrice, setSelectedMaxPrice] = useState("");
 
+  // 1. Carrega Marcas (Depende do Tipo)
   useEffect(() => {
-    async function fetchFilters() {
-      try {
-        const [brandsRes, yearsRes] = await Promise.all([
-          api.get("/vehicles/filters/brands"),
-          api.get("/vehicles/filters/years"),
-        ]);
-        setBrands(brandsRes.data);
-        setYears(yearsRes.data);
-      } catch (error) {
-        console.error("Falha ao buscar filtros:", error);
-      }
-    }
-    fetchFilters();
-  }, []);
-
-  useEffect(() => {
-    if (selectedBrand) {
-      api
-        .get(`/vehicles/filters/models?brand=${selectedBrand}`)
-        .then((res) => setModels(res.data))
-        .catch((err) => console.error("Falha ao buscar modelos:", err));
-    } else {
-      setModels([]);
-    }
+    // Resetar seleções dependentes
+    setSelectedBrand("");
     setSelectedModel("");
-  }, [selectedBrand]);
+
+    setLoadingCount(prev => prev + 1);
+    const params = new URLSearchParams();
+    if (selectedType) params.append("type", selectedType);
+
+    api.get(`/vehicles/filters/brands?${params.toString()}`)
+      .then((res) => setBrands(res.data))
+      .catch((err) => console.error("Falha ao buscar marcas:", err))
+      .finally(() => setLoadingCount(prev => Math.max(0, prev - 1)));
+  }, [selectedType]);
+
+  // 2. Carrega Modelos (Depende da Marca e Tipo)
+  useEffect(() => {
+    // Resetar modelo
+    setSelectedModel("");
+
+    const params = new URLSearchParams();
+    if (selectedType) params.append("type", selectedType);
+    if (selectedBrand) params.append("brand", selectedBrand);
+
+    // Só busca modelos se houver marca selecionada
+    if (selectedBrand) {
+        setLoadingCount(prev => prev + 1);
+        api.get(`/vehicles/filters/models?${params.toString()}`)
+        .then((res) => setModels(res.data))
+        .catch((err) => console.error("Falha ao buscar modelos:", err))
+        .finally(() => setLoadingCount(prev => Math.max(0, prev - 1)));
+    } else {
+        setModels([]);
+    }
+  }, [selectedBrand, selectedType]);
+
+  // 3. Carrega Anos (Depende de Marca, Modelo e Tipo)
+  useEffect(() => {
+    setLoadingCount(prev => prev + 1);
+    const params = new URLSearchParams();
+    if (selectedType) params.append("type", selectedType);
+    if (selectedBrand) params.append("brand", selectedBrand);
+    if (selectedModel) params.append("model", selectedModel);
+
+    api.get(`/vehicles/filters/years?${params.toString()}`)
+      .then((res) => setYears(res.data))
+      .catch((err) => console.error("Falha ao buscar anos:", err))
+      .finally(() => setLoadingCount(prev => Math.max(0, prev - 1)));
+  }, [selectedBrand, selectedModel, selectedType]);
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,20 +94,31 @@ export default function AdvancedSearch() {
     if (selectedModel) params.append("modelo", selectedModel);
     if (selectedMinYear) params.append("ano_min", selectedMinYear);
     if (selectedMaxYear) params.append("ano_max", selectedMaxYear);
-    if (selectedMinPrice) params.append("preco_min", selectedMinPrice);
-    if (selectedMaxPrice) params.append("preco_max", selectedMaxPrice);
+    if (selectedMinPrice) params.append("preco_min", selectedMinPrice.replace("R$ ", "").replace(/\./g, ""));
+    if (selectedMaxPrice) params.append("preco_max", selectedMaxPrice.replace("R$ ", "").replace(/\./g, ""));
 
     router.push(`/estoque?${params.toString()}`);
   };
 
   const inputClass =
-    "rounded-lg border border-white/20 bg-white/60 backdrop-blur-sm p-2 text-black font-medium shadow-sm hover:bg-white/80 transition-all focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer";
+    "rounded-lg border border-white/20 bg-white/60 backdrop-blur-sm p-2 text-black font-medium shadow-sm hover:bg-white/80 transition-all focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
 
   return (
     <section className="py-12 my-[-60px]">
       <div className="mx-auto max-w-6xl px-4">
 
-        <div className="rounded-2xl bg-white/10 backdrop-blur-xl p-8 shadow-2xl border border-white/20">
+        {/* Adicionei 'relative' e 'overflow-hidden' para conter o overlay */}
+        <div className="relative overflow-hidden rounded-2xl bg-white/10 backdrop-blur-xl p-8 shadow-2xl border border-white/20">
+
+          {/* Overlay de Loading */}
+          {isLoading && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/40 backdrop-blur-[2px] rounded-2xl transition-all">
+                <div className="flex flex-col items-center gap-2 bg-white p-4 rounded-xl shadow-lg border border-gray-100 animate-in fade-in zoom-in duration-200">
+                    <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                    <span className="text-xs font-semibold text-gray-500">Atualizando filtros...</span>
+                </div>
+            </div>
+          )}
 
           <h2 className="text-3xl font-extrabold text-center text-blue-950 uppercase mb-8 tracking-wide">
             Encontre seu veículo
@@ -110,7 +149,11 @@ export default function AdvancedSearch() {
                 ))}
               </select>
 
-              <select className={inputClass} value={selectedBrand} onChange={(e) => setSelectedBrand(e.target.value)}>
+              <select 
+                className={inputClass} 
+                value={selectedBrand} 
+                onChange={(e) => setSelectedBrand(e.target.value)}
+              >
                 <option value="">Marca</option>
                 {brands.map((b) => (
                   <option key={b}>{b}</option>
@@ -232,11 +275,21 @@ export default function AdvancedSearch() {
             {/* Botão Buscar */}
             <button
               type="submit"
+              disabled={isLoading}
               className="w-full rounded-xl bg-blue-700 px-6 py-4 text-lg font-bold text-white shadow-xl 
-              hover:bg-blue-800 transition-all hover:scale-[1.03] active:scale-[0.98] flex items-center justify-center gap-2"
+              hover:bg-blue-800 transition-all hover:scale-[1.03] active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              <Search size={22} />
-              Buscar Veículos
+              {isLoading ? (
+                <>
+                    <Loader2 size={22} className="animate-spin" />
+                    Buscando...
+                </>
+              ) : (
+                <>
+                    <Search size={22} />
+                    Buscar Veículos
+                </>
+              )}
             </button>
           </form>
         </div>
