@@ -61,7 +61,7 @@ export default function Header() {
               <HeaderSearch onNavigate={() => setOpen(false)} />
             </div>
             <button
-              className="button button-small header-contact"
+              className="button button-small header-contact contact-shine"
               onClick={openModal}
             >
               Fale com a gente <ArrowUpRight size={16} />
@@ -94,7 +94,7 @@ export default function Header() {
               </Link>
             ))}
             <button
-              className="button"
+              className="button contact-shine"
               onClick={() => {
                 setOpen(false);
                 openModal();

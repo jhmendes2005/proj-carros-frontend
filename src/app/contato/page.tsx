@@ -76,7 +76,7 @@ export default function ContactPage() {
         </p>
       </div>
       <div className="contact-methods">
-        <button onClick={openModal}>
+        <button className="contact-shine" onClick={openModal}>
           <MessageCircle size={25} />
           <span>
             Seu próximo carro começa aqui<strong>Fale pelo WhatsApp</strong>

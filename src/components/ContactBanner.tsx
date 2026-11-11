@@ -13,7 +13,7 @@ export default function ContactBanner() {
           Uma conversa de distância.
         </h2>
       </div>
-      <button className="button" onClick={openModal}>
+      <button className="button contact-shine" onClick={openModal}>
         <MessageCircle size={19} /> Fale com um consultor{" "}
         <ArrowUpRight size={19} />
       </button>

@@ -3895,3 +3895,57 @@ select:disabled {
     font-size: 13px;
   }
 }
+
+/* Continuous shimmer shared by contact calls to action. */
+.contact-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  animation: contact-glow 3.8s ease-in-out infinite;
+}
+.contact-shine::after {
+  content: "";
+  position: absolute;
+  top: -70%;
+  bottom: -70%;
+  left: -65%;
+  width: 42%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 35%),
+    transparent
+  );
+  transform: translateX(0) skewX(-20deg);
+  animation: contact-shimmer 3.8s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes contact-shimmer {
+  0%,
+  12% {
+    transform: translateX(0) skewX(-20deg);
+  }
+  62%,
+  100% {
+    transform: translateX(500%) skewX(-20deg);
+  }
+}
+@keyframes contact-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgb(74 139 255 / 15%);
+  }
+  50% {
+    box-shadow: 0 0 22px rgb(74 139 255 / 38%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-shine {
+    animation: none !important;
+    box-shadow: 0 0 14px rgb(74 139 255 / 25%);
+  }
+  .contact-shine::after {
+    animation: none !important;
+    display: none;
+  }
+}
