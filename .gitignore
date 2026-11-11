@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Backend workspace
+backend/dist/
+backend/node_modules/
+backend/coverage/
+!.env.example

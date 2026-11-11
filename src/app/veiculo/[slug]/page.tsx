@@ -132,7 +132,7 @@ function VehicleCard({ vehicle }: { vehicle: Veiculo }) {
 
 export default function DetalheVeiculo() {
   const params = useParams();
-  const slug = params.slug as string;
+  const slug = params?.slug as string;
 
   const [veiculo, setVeiculo] = useState<Veiculo | null>(null);
   const [destaques, setDestaques] = useState<Veiculo[]>([]);

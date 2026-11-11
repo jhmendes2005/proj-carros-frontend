@@ -1,0 +1,46 @@
+name: Atualizar estoque
+
+on:
+  schedule:
+    # Offset avoids the busiest minute of the hour; UTC, every 30 minutes.
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: sync-stock-production
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Sincronizar estoque na Vercel
+        env:
+          APP_URL: ${{ vars.APP_URL || 'https://www.bomjesusautomoveis.com' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$APP_URL" || -z "$CRON_SECRET" ]]; then
+            echo 'Configure a variável APP_URL e o secret CRON_SECRET no repositório.'
+            exit 1
+          fi
+          if [[ "$APP_URL" != https://* ]]; then
+            echo 'APP_URL deve usar HTTPS.'
+            exit 1
+          fi
+          status=$(curl --silent --show-error --connect-timeout 20 --max-time 310 \
+            --output "$RUNNER_TEMP/stock-sync.json" --write-out '%{http_code}' \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            "${APP_URL%/}/api/cron/sync-stock")
+          if [[ "$status" == 409 ]]; then
+            echo 'Sincronização já em andamento; execução ignorada.'
+          elif [[ "$status" == 200 ]]; then
+            echo 'Estoque atualizado com sucesso.'
+          else
+            echo "Falha ao sincronizar estoque: HTTP $status. Consulte os logs da Vercel."
+            exit 1
+          fi

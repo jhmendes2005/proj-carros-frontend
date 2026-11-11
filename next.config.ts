@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['@carros/backend'],
+  outputFileTracingIncludes: {
+    '/api/**': ['backend/dist/**/*', 'node_modules/.prisma/client/**/*'],
+  },
   images: {
     remotePatterns: [
       {

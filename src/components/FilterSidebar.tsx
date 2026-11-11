@@ -47,14 +47,14 @@ export default function VehicleFilter({ onClose }: VehicleFilterProps) {
     // 1. Sincronizar estado local com a URL na montagem ou navegação
     useEffect(() => {
         const currentFilters = {
-            tipo: searchParams.get("tipo") || "",
-            marca: searchParams.get("marca") || "",
-            modelo: searchParams.get("modelo") || "",
-            ano_min: searchParams.get("ano_min") || "",
-            ano_max: searchParams.get("ano_max") || "",
-            preco_min: searchParams.get("preco_min") || "",
-            preco_max: searchParams.get("preco_max") || "",
-            sort: searchParams.get("sort") || ""
+            tipo: searchParams?.get("tipo") || "",
+            marca: searchParams?.get("marca") || "",
+            modelo: searchParams?.get("modelo") || "",
+            ano_min: searchParams?.get("ano_min") || "",
+            ano_max: searchParams?.get("ano_max") || "",
+            preco_min: searchParams?.get("preco_min") || "",
+            preco_max: searchParams?.get("preco_max") || "",
+            sort: searchParams?.get("sort") || ""
         };
         setFilters(currentFilters);
     }, [searchParams]);
@@ -127,7 +127,7 @@ export default function VehicleFilter({ onClose }: VehicleFilterProps) {
         const params = new URLSearchParams();
 
         // Mantém a busca textual se existir
-        const q = searchParams.get("q");
+        const q = searchParams?.get("q");
         if (q) params.set("q", q);
 
         // Adiciona filtros preenchidos

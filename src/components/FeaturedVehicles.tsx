@@ -1,7 +1,10 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Gauge, Calendar, Star, ChevronsRight } from "lucide-react";
-import { api } from "@/src/lib/api"; // ⚙️ nova versão do cliente para SSR
+import { api } from "@/src/lib/api";
 
 // 1. Interface para os dados do card
 interface VehicleCardProps {
@@ -12,18 +15,6 @@ interface VehicleCardProps {
   preco: number;
   quilometragem: number | null;
   fotos: string[];
-}
-
-// 2. Função de busca de dados (Server-side)
-async function getFeaturedVehicles(count: number) {
-  try {
-    // Chama o backend via Axios (no servidor)
-    const res = await api.get(`/vehicles/featured?count=${count}`);
-    return res.data;
-  } catch (error) {
-    console.error("❌ Falha ao buscar destaques:", error);
-    return [];
-  }
 }
 
 // 3. O Componente de Card (reutilizável)
@@ -86,9 +77,19 @@ function VehicleCard({ vehicle }: { vehicle: VehicleCardProps }) {
   );
 }
 
-// 4. O Componente Principal (Server Component)
-export default async function FeaturedVehicles({ count = 6 }: { count?: number }) {
-  const vehicles: VehicleCardProps[] = await getFeaturedVehicles(count);
+// 4. O Componente Principal
+export default function FeaturedVehicles({ count = 6 }: { count?: number }) {
+  const [vehicles, setVehicles] = useState<VehicleCardProps[]>([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    api.get<VehicleCardProps[]>(`/vehicles/featured?count=${count}`, {
+      signal: controller.signal,
+    }).then(({ data }) => setVehicles(data)).catch((error) => {
+      if (!controller.signal.aborted) console.error('Falha ao buscar destaques:', error);
+    });
+    return () => controller.abort();
+  }, [count]);
 
   if (!vehicles || vehicles.length === 0) {
     return null;

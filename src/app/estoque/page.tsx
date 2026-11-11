@@ -26,8 +26,8 @@ export default function Estoque() {
         setIsLoading(true);
 
         const params = {
-            q: searchParams.get("q"),
-            ...Object.fromEntries(searchParams.entries())
+            q: searchParams?.get("q"),
+            ...Object.fromEntries(searchParams?.entries() ?? [])
         };
 
         api.get("/vehicles", { params })
