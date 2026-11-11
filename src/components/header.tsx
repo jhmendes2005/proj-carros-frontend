@@ -2,8 +2,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Menu, X, Search, MapPin } from "lucide-react";
+import { ArrowUpRight, Menu, X, MapPin } from "lucide-react";
 import Brand from "./Brand";
+import HeaderSearch from "./HeaderSearch";
 import { useWhatsApp } from "../context/WhatsAppContext";
 const links = [
   { href: "/estoque", label: "Nosso estoque" },
@@ -56,13 +57,9 @@ export default function Header() {
             ))}
           </nav>
           <div className="header-actions">
-            <Link
-              className="icon-button desktop-search"
-              href="/estoque"
-              aria-label="Buscar veículos"
-            >
-              <Search size={19} />
-            </Link>
+            <div className="header-search-desktop">
+              <HeaderSearch onNavigate={() => setOpen(false)} />
+            </div>
             <button
               className="button button-small header-contact"
               onClick={openModal}
@@ -80,6 +77,9 @@ export default function Header() {
               {open ? <X /> : <Menu />}
             </button>
           </div>
+        </div>
+        <div className="site-container header-search-mobile">
+          <HeaderSearch onNavigate={() => setOpen(false)} />
         </div>
         {open && (
           <nav
