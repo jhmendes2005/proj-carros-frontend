@@ -72,3 +72,12 @@ Requisições simultâneas recebem HTTP 409; configuração ausente recebe 503; 
 A importação tem orçamento de aproximadamente 240 segundos e a função até 300 segundos. Estoques que excedam esse tempo precisam de processamento em lotes ou worker externo.
 
 Referências: [limites do cron da Vercel](https://vercel.com/docs/cron-jobs/usage-and-pricing), [agendamentos do GitHub Actions](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+
+
+## Identidade visual e interface
+
+A interface usa uma identidade escura com grafite e azul, preservando o emblema original. Os componentes `VehicleCard`, `Brand` e `ContactBanner` unificam o catálogo, a navegação e as chamadas de contato. Os tokens visuais e os breakpoints estão em `src/app/globals.css`.
+
+O estoque mantém filtros na URL, ordenação e carregamento progressivo. No celular, os filtros abrem em um diálogo; a página do veículo inclui galeria com teclado e uma ação de contato fixa. Diálogos têm fechamento por Escape, contenção e restauração de foco; animações respeitam `prefers-reduced-motion`.
+
+A foto ilustrativa da abertura é servida localmente em `public/showroom-hero.jpg`, a partir da [fotografia no Unsplash](https://images.unsplash.com/photo-1494976388531-d1058494cdd8). Os anúncios continuam usando exclusivamente fotografias e dados reais do estoque.

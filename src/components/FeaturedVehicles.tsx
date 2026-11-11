@@ -1,113 +1,91 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { Gauge, Calendar, Star, ChevronsRight } from "lucide-react";
-import { api } from "@/src/lib/api";
-
-// 1. Interface para os dados do card
-interface VehicleCardProps {
-  slug: string;
-  marca: string;
-  modelo: string;
-  anoModelo: number | null;
-  preco: number;
-  quilometragem: number | null;
-  fotos: string[];
-}
-
-// 3. O Componente de Card (reutilizável)
-function VehicleCard({ vehicle }: { vehicle: VehicleCardProps }) {
+import { ArrowUpRight, RefreshCw } from "lucide-react";
+import { api } from "../lib/api";
+import { Vehicle } from "../lib/vehicles";
+import VehicleCard from "./VehicleCard";
+export function VehicleSkeletons({ count = 3 }: { count?: number }) {
   return (
-    <Link
-      href={`/veiculo/${vehicle.slug}`}
-      className="group block overflow-hidden rounded-lg border border-gray-200 shadow-sm transition-shadow hover:shadow-lg"
+    <div
+      className="vehicle-grid"
+      aria-label="Carregando veículos"
+      role="status"
     >
-      <div className="relative h-48 w-full">
-        <Image
-          src={vehicle.fotos[0]}
-          alt={`${vehicle.marca} ${vehicle.modelo}`}
-          fill
-          style={{ objectFit: "cover" }}
-          className="transition-transform group-hover:scale-110"
-        />
-        <span className="absolute top-2 left-2 z-20 bg-blue-800 text-white text-xs font-semibold px-2 py-1 rounded-md flex items-center gap-1">
-          <Star size={14} className="text-white-300" />
-          Novidade
-        </span>
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-bold text-blue-800">
-          {vehicle.marca} {vehicle.modelo}
-        </h3>
-
-        <div className="mt-2 flex gap-4 text-sm text-gray-600">
-          {vehicle.anoModelo && (
-            <span className="flex items-center gap-1">
-              <Calendar size={14} />
-              {vehicle.anoModelo}
-            </span>
-          )}
-          {vehicle.quilometragem !== null && (
-            <span className="flex items-center gap-1">
-              <Gauge size={14} />
-              {vehicle.quilometragem.toLocaleString("pt-BR")} KM
-            </span>
-          )}
+      {Array.from({ length: count }, (_, i) => (
+        <div className="skeleton-card" key={i}>
+          <div />
+          <span />
+          <span />
+          <span />
         </div>
-
-        <p className="mt-4 text-2xl font-bold text-blue-600">
-          R${" "}
-          {vehicle.preco.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}
-        </p>
-        <button
-          className="mt-4 w-full rounded-xl bg-gradient-to-r from-blue-600 to-blue-800  
-                    text-white font-semibold py-2.5 shadow-md transition-all duration-300 
-                    hover:from-blue-800  hover:to-blue-600 hover:scale-[1.02] active:scale-95
-                    flex items-center justify-center gap-2"
-        >
-          Ver mais
-          <ChevronsRight className="w-4 h-4 text-white-300" />
-        </button>
-      </div>
-    </Link>
+      ))}
+    </div>
   );
 }
-
-// 4. O Componente Principal
 export default function FeaturedVehicles({ count = 6 }: { count?: number }) {
-  const [vehicles, setVehicles] = useState<VehicleCardProps[]>([]);
-
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
-    const controller = new AbortController();
-    api.get<VehicleCardProps[]>(`/vehicles/featured?count=${count}`, {
-      signal: controller.signal,
-    }).then(({ data }) => setVehicles(data)).catch((error) => {
-      if (!controller.signal.aborted) console.error('Falha ao buscar destaques:', error);
-    });
-    return () => controller.abort();
-  }, [count]);
-
-  if (!vehicles || vehicles.length === 0) {
-    return null;
-  }
-
+    const c = new AbortController();
+    setLoading(true);
+    setError(false);
+    api
+      .get<Vehicle[]>("/vehicles", { signal: c.signal })
+      .then((r) => setVehicles(r.data.slice(0, count)))
+      .catch(() => {
+        if (!c.signal.aborted) setError(true);
+      })
+      .finally(() => {
+        if (!c.signal.aborted) setLoading(false);
+      });
+    return () => c.abort();
+  }, [count, retry]);
   return (
-    <section className="bg-gray-50 py-12">
-      <div className="mx-auto max-w-6xl px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Destaques do Estoque
-        </h2>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {vehicles.map((vehicle) => (
-            <VehicleCard key={vehicle.slug} vehicle={vehicle} />
+    <section className="site-container section-space">
+      <div className="section-heading">
+        <div>
+          <span className="eyebrow">ESCOLHAS QUE FAZEM SENTIDO</span>
+          <h2>
+            Seu próximo carro.
+            <br />
+            <span>Já está por aqui.</span>
+          </h2>
+        </div>
+        <Link className="button button-outline" href="/estoque">
+          Ver estoque completo <ArrowUpRight size={18} />
+        </Link>
+      </div>
+      {loading ? (
+        <VehicleSkeletons count={count} />
+      ) : error ? (
+        <div className="empty-state">
+          <h3>Não foi possível carregar o estoque.</h3>
+          <p>Confira sua conexão e tente novamente.</p>
+          <button
+            className="button button-outline"
+            onClick={() => setRetry(retry + 1)}
+          >
+            <RefreshCw size={16} /> Tentar novamente
+          </button>
+        </div>
+      ) : vehicles.length ? (
+        <div className="vehicle-grid">
+          {vehicles.map((v) => (
+            <VehicleCard key={v.id} vehicle={v} />
           ))}
         </div>
-      </div>
+      ) : (
+        <div className="empty-state">
+          <h3>Novidades a caminho.</h3>
+          <p>Fale com nossa equipe para encontrar o seu veículo.</p>
+          <Link href="/contato" className="button">
+            Entre em contato <ArrowUpRight size={17} />
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

@@ -254,7 +254,7 @@ export default function AdminPage() {
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
         <div className="flex items-center gap-2">
             <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">A</div>
-            <h1 className="text-xl font-bold text-gray-800">Admin Panel</h1>
+            <h1 className="text-xl font-bold text-gray-800">Painel Bom Jesus</h1>
         </div>
         <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">Olá, <strong>{user.nome}</strong></span>
@@ -264,7 +264,7 @@ export default function AdminPage() {
 
       <div className="flex flex-1">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+        <aside className="w-64 bg-white border-r border-gray-200 admin-navigation flex flex-col">
             <nav className="p-4 space-y-2">
                 {[
                     { id: "dashboard", icon: BarChart3, label: "Dashboard" },

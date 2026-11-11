@@ -2,20 +2,17 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 // --- Import CSS ---
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import "./globals.css";
 
 // --- Importações dos Componentes ---
-import Header from '@/src/components/header';
-import FloatingWhatsApp from "@/src/components/FloatingWhatsApp"; 
+import SiteFrame from "@/src/components/SiteFrame";
 import AnalyticsTracker from "@/src/components/AnalyticsTracker";
-import Footer from "@/src/components/Footer";
-import AIChatButton from "../components/AIChatButton";
 
 // --- Importação do Contexto ---
-import { WhatsAppProvider } from "@/src/context/WhatsAppContext"; 
+import { WhatsAppProvider } from "@/src/context/WhatsAppContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,9 +25,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Bom Jesus Automóveis - Veículos Novos e Seminovos",
-  description: "Qualidade e confiança na compra do seu próximo veículo.",
-  icons: { icon: "/favicon.ico" } 
+  title: {
+    default: "Bom Jesus Automóveis | Seu próximo carro em Guarapuava",
+    template: "%s | Bom Jesus Automóveis",
+  },
+  description:
+    "Encontre seu próximo veículo na Bom Jesus Automóveis. Explore nosso estoque de carros, caminhonetes e motos e visite nossas lojas em Guarapuava, PR.",
+  icons: { icon: "/favicon.ico" },
 };
 
 export default function RootLayout({
@@ -41,26 +42,14 @@ export default function RootLayout({
   return (
     <html lang="pt-br">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* Provider para estado do modal funcionar em qualquer lugar */}
         <WhatsAppProvider>
-          
           {/* Analytics roda invisível no topo */}
           <AnalyticsTracker />
-          
-          <Header />
 
-          <main className="min-h-screen">
-              {children}
-          </main>
-
-          <Footer />
-          
-          {/* Botões flutuantes */}
-          {/* <AIChatButton /> */}
-          <FloatingWhatsApp />
-          
+          <SiteFrame>{children}</SiteFrame>
         </WhatsAppProvider>
       </body>
     </html>

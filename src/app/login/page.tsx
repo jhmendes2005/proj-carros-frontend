@@ -1,69 +1,103 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { api } from "@/src/lib/api";
-
+import Link from "next/link";
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  LockKeyhole,
+  Loader2,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { api } from "../../lib/api";
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setErro("");
-
-    try {
-      const res = await api.post("/auth/login", { email, senha });
-
-      // 🔹 salva token e dados do usuário
-      localStorage.setItem("token", res.data.access_token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-
-      // 🔹 redireciona
-      router.push("/admin");
-    } catch (err: any) {
-      console.error(err);
-      setErro("E-mail ou senha incorretos");
-    }
-  }
-
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState(false);
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleLogin}
-        className="bg-white shadow-lg rounded-xl p-8 w-96"
-      >
-        <h1 className="text-2xl font-semibold mb-6 text-center">
-          Painel Administrativo
+    <div className="login-page site-container">
+      <div className="login-editorial">
+        <span className="eyebrow">BOM JESUS · ÁREA DA EQUIPE</span>
+        <h1>
+          Por trás de cada
+          <br />
+          nova <em>conquista.</em>
         </h1>
-
-        {erro && <p className="text-red-500 text-sm mb-4">{erro}</p>}
-
-        <input
-          type="email"
-          placeholder="E-mail"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 mb-3"
-          required
-        />
-
-        <input
-          type="password"
-          placeholder="Senha"
-          value={senha}
-          onChange={(e) => setSenha(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 mb-5"
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-        >
-          Entrar
+        <p>Gerencie o estoque e cuide dos próximos caminhos da Bom Jesus.</p>
+        <Link className="text-link" href="/">
+          <ArrowLeft size={17} />
+          Voltar ao site
+        </Link>
+      </div>
+      <form
+        className="login-form"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setError("");
+          setLoading(true);
+          try {
+            const r = await api.post("/auth/login", { email, senha });
+            localStorage.setItem("token", r.data.access_token);
+            localStorage.setItem("user", JSON.stringify(r.data.user));
+            router.push("/admin");
+          } catch {
+            setError(
+              "Não foi possível entrar. Confira seu e-mail e senha e tente novamente.",
+            );
+          } finally {
+            setLoading(false);
+          }
+        }}
+      >
+        <LockKeyhole size={25} />
+        <h2>Acesse sua conta.</h2>
+        <p>Use suas credenciais para entrar no painel.</p>
+        {error && (
+          <div className="inline-notice" role="alert">
+            {error}
+          </div>
+        )}
+        <label htmlFor="login-email">
+          E-mail
+          <input
+            id="login-email"
+            type="email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="seu@email.com"
+            required
+          />
+        </label>
+        <label htmlFor="login-password">
+          Senha
+          <div className="password-input">
+            <input
+              id="login-password"
+              type={show ? "text" : "password"}
+              autoComplete="current-password"
+              required
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              placeholder="Sua senha"
+            />
+            <button
+              type="button"
+              aria-label={show ? "Ocultar senha" : "Mostrar senha"}
+              onClick={() => setShow(!show)}
+            >
+              {show ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </label>
+        <button className="button" type="submit" disabled={loading}>
+          {loading ? <Loader2 className="spin" size={18} /> : null}
+          {loading ? "Entrando…" : "Entrar no painel"}
+          <ArrowUpRight size={18} />
         </button>
       </form>
     </div>
